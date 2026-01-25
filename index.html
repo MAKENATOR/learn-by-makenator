@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn with MaKeNaToER</title>
+<style>
+body, html {
+  margin: 0; padding: 0;
+  font-family: Arial, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  transition: background 1s;
+}
+
+/* Top Bar */
+#topBar {
+  width: 100%;
+  padding: 15px 0;
+  background: #111;
+  color: #fff;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* Landing Page */
+#landing {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  padding-top: 60px; /* leave space for top bar */
+}
+
+.half {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  transition: flex 1s;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+#chemHalf {
+  background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqFfXtMDuxDXidZvWj_xI9blD2MRfFz7ik-w&s') center/cover no-repeat;
+}
+#physHalf {
+  background: url('https://s3.envato.com/files/53980389/preview.jpg') center/cover no-repeat;
+}
+
+/* Midline */
+#midline {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: white;
+  transition: left 1s;
+}
+
+/* Physics Section */
+#physics {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 80px; /* leave space for top bar */
+  width: 100%;
+  height: 100vh;
+  background: #111;
+  color: white;
+  overflow-y: auto;
+}
+
+#physics h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+}
+
+/* Liquid-glass + glow + ripple */
+.topic-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  font-size: 18px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s, box-shadow 0.3s, opacity 0.5s, transform 0.5s;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.topic-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.topic-btn:hover {
+  transform: scale(1.07);
+  background: rgba(255,255,255,0.25);
+  box-shadow: 0 0 25px rgba(0,255,255,0.6), 0 0 50px rgba(0,255,255,0.3);
+}
+
+.topic-btn::after {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(0,255,255,0.3);
+  display: block;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0);
+  transition: transform 0.5s, opacity 1s;
+}
+
+.topic-btn:active::after {
+  transform: scale(3);
+  opacity: 0.5;
+  transition: 0s;
+}
+
+/* Back button */
+.back-btn {
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  background: #48cae4;
+  border: none;
+  cursor: pointer;
+}
+
+/* Video container */
+#videoContainer {
+  margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div id="topBar">Learn with MaKeNaToER</div>
+
+<!-- Landing -->
+<div id="landing">
+  <div class="half" id="chemHalf" onclick="showComingSoon('chem')">Chemistry</div>
+  <div class="half" id="physHalf" onclick="selectPhysics()">Physics</div>
+  <div id="midline"></div>
+</div>
+
+<!-- Physics -->
+<div id="physics">
+  <button class="back-btn" onclick="backToLanding()">Back to Landing</button>
+  <h2 id="physicsHeader">Physics Topics</h2>
+  <div class="topic-grid" id="physicsTopics"></div>
+</div>
+
+<script>
+const physicsData = {
+  "Mechanics": ["Kinematics","Laws of Motion","Work, Energy & Power","Gravitation","Oscillations","Fluid Mechanics"],
+  "Thermodynamics": [], "Waves": [], "Optics": [], "Electricity & Magnetism": [],
+  "Modern Physics": [], "Nuclear Physics": [], "Particle Physics": []
+};
+
+// YouTube watch URLs (new tab)
+const mechanicsLinks = {
+  "Kinematics": "https://www.youtube.com/watch?v=FNOp51TgLEQ",
+  "Laws of Motion": "https://www.youtube.com/watch?v=UNX2_i1nrnI",
+  "Work, Energy & Power": "https://www.youtube.com/watch?v=_i487tNP758",
+  "Gravitation": "https://www.youtube.com/watch?v=IoGuqRDJrSY",
+  "Oscillations": "https://www.youtube.com/watch?v=qeXCrxLMzjA",
+  "Fluid Mechanics": "https://www.youtube.com/watch?v=0gmhlElpyf0"
+};
+
+function showComingSoon(subject){
+  alert(subject === 'chem' ? 'Chemistry Section Coming Soon! ⚗️' : 'Topic Coming Soon! ⚡');
+}
+
+function selectPhysics(){
+  document.getElementById('midline').style.left = '75%';
+  document.getElementById('chemHalf').style.flex = '0.5';
+  document.getElementById('physHalf').style.flex = '1.5';
+  setTimeout(() => {
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('physics').style.display = 'flex';
+    document.body.style.background = '#111';
+    showMainTopics();
+  }, 1000);
+}
+
+function backToLanding(){
+  document.getElementById('physics').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  document.body.style.background = 'linear-gradient(to bottom, #a0c4ff, #caf0f8)';
+  document.getElementById('midline').style.left = '50%';
+  document.getElementById('chemHalf').style.flex = '1';
+  document.getElementById('physHalf').style.flex = '1';
+  document.getElementById('physicsTopics').innerHTML = '';
+  document.getElementById('physicsHeader').innerText = 'Physics Topics';
+}
+
+function showMainTopics(){
+  const container = document.getElementById('physicsTopics');
+  container.innerHTML = '';
+  document.getElementById('physicsHeader').innerText = 'Physics Topics';
+  Object.keys(physicsData).forEach((topic, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'topic-btn';
+    btn.innerText = topic;
+    btn.onclick = () => {
+      if(physicsData[topic].length > 0) showSubTopics(topic);
+      else showComingSoon();
+    };
+    container.appendChild(btn);
+    setTimeout(() => btn.classList.add('visible'), i*100);
+  });
+}
+
+function showSubTopics(mainTopic){
+  const container = document.getElementById('physicsTopics');
+  container.innerHTML = '';
+  document.getElementById('physicsHeader').innerText = mainTopic + " Subtopics";
+
+  physicsData[mainTopic].forEach((sub, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'topic-btn';
+    btn.innerText = sub;
+    btn.onclick = () => {
+      if(mainTopic === "Mechanics" && mechanicsLinks[sub]){
+        window.open(mechanicsLinks[sub], "_blank");
+      } else {
+        showComingSoon();
+      }
+    };
+    container.appendChild(btn);
+    setTimeout(() => btn.classList.add('visible'), i*100);
+  });
+}
+</script>
+
+</body>
+</html>
